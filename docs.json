@@ -12,7 +12,9 @@
     "groups": [
       {
         "group": "Getting started",
-        "pages": []
+        "pages": [
+          "test"
+        ]
       },
       {
         "group": "Configuration",
