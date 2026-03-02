@@ -267,7 +267,7 @@ msg-access-main =
     
     <blockquote>
     • <b>Режим</b>: { access-mode }
-    • <b>Покупки</b>: { $purchases_allowed ->
+    • <b>Платежи</b>: { $payments_allowed ->
     [0] запрещены
     *[1] разрешены
     }.
@@ -523,9 +523,13 @@ msg-user-subscription-info =
     { frg-subscription-details }
 
     <blockquote>
-    • <b>Сквады</b>: { $squads -> 
+    • <b>Внутренние сквады</b>: { $internal_squads ->
     [0] { unknown }
-    *[HAS] { $squads }
+    *[HAS] { $internal_squads }
+    }
+    • <b>Внешний сквад</b>: { $external_squad ->
+    [0] { unknown }
+    *[HAS] { $external_squad }
     }
     • <b>Первое подключение</b>: { $first_connected_at -> 
     [0] { unknown }
@@ -616,9 +620,9 @@ msg-remnawave-users =
     </blockquote>
 
 msg-remnawave-host-details =
-    <b>{ $remark } ({ $status ->
-    [ON] включен
-    *[OFF] выключен
+    <b>{ $remark } ({ $is_disabled ->
+    [1] выключен
+    *[0] включен
     }):</b>
     <blockquote>
     • <b>Адрес</b>: <code>{ $address }:{ $port }</code>
@@ -629,9 +633,9 @@ msg-remnawave-host-details =
     </blockquote>
 
 msg-remnawave-node-details =
-    <b>{ $country } { $name } ({ $status ->
-    [ON] подключено
-    *[OFF] отключено
+    <b>{ $country } { $name } ({ $is_connected ->
+    [1] подключено
+    *[0] отключено
     }):</b>
     <blockquote>
     • <b>Адрес</b>: <code>{ $address }{ $port -> 
@@ -647,7 +651,10 @@ msg-remnawave-inbound-details =
     <b>🔗 { $tag }</b>
     <blockquote>
     • <b>ID</b>: <code>{ $inbound_id }</code>
-    • <b>Протокол</b>: { $type } ({ $network })
+    • <b>Протокол</b>: { $type } { $network -> 
+    [0] { space }
+    *[HAS] ({ $network })
+    }
     { $port ->
     [0] { empty }
     *[HAS] • <b>Порт</b>: { $port }
@@ -675,8 +682,57 @@ msg-remnawave-inbounds =
 
 
 # RemnaShop
-msg-remnashop-main = <b>🛍 RemnaShop v{ $version }</b>
+msg-remnashop-main = <b>🛍 RemnaShop { $version ->
+[0] { space }
+*[HAS] v{ $version }
+}</b>
+
 msg-admins-main = <b>👮‍♂️ Администраторы</b>
+
+
+# Menu editor
+msg-menu-editor-main =
+    <b>🎛 Редактор кнопок главного меню</b>
+
+    Выберите кнопку для редактирования.
+
+msg-menu-editor-button =
+    <b>🎛 Конфигуратор кнопки</b>
+
+    <blockquote>
+    • <b>Статус</b>: { $is_active -> 
+        [1] 🟢 Включена
+        *[0] 🔴 Выключена
+        }
+    • <b>Текст</b>: { $text }
+    • <b>Доступ</b>: { role }
+    • <b>Тип</b>: { button-type }
+    • <b>Данные</b>: { $payload }
+    
+    </blockquote>
+
+    Выберите пункт для изменения.
+
+msg-menu-editor-button-text =
+    <b>🏷️ Изменить текст кнопки</b>
+
+    Введите текст кнопки (маскимум 16 символов) или ключ перевода.
+
+msg-menu-editor-button-availability =
+    <b>✴️ Изменить доступ к кнопке</b>
+
+    Выберите роль для доступа к кнопке.
+
+msg-menu-editor-button-type =
+    <b>🔖 Изменить тип кнопки</b>
+
+    Выберите тип кнопки.
+
+msg-menu-editor-button-payload =
+    <b>📄 Изменить данные кнопки</b>
+
+    Введите данные кнопки (для ссылок использовать https).
+
 
 
 # Gateways
@@ -776,12 +832,25 @@ msg-referral-reward =
 # Plans
 msg-plans-main = <b>📦 Планы</b>
 
+msg-plans-import = 
+    <b>📦 Импортировать планы</b>
+
+    Отправьте json файл для импорта.
+
+msg-plans-export = 
+    <b>📦 Экспортировать планы</b>
+
+    Выберите планы для экспорта.
+
 msg-plan-configurator =
     <b>📦 Конфигуратор плана</b>
 
     <blockquote>
     • <b>Название</b>: { $name }
-    • <b>Тип</b>: { plan-type }
+    • <b>Тип</b>: { plan-type } { $is_trial ->
+    [1] (Пробник)
+    *[0] { space }
+    }
     • <b>Доступ</b>: { availability-type }
     • <b>Статус</b>: { $is_active -> 
         [1] 🟢 Включен
@@ -813,7 +882,7 @@ msg-plan-name =
     </blockquote>
     }
 
-    Введите новое название плана.
+    Введите уникальное название плана или ключ перевода (максимум 16 символов).
 
 msg-plan-description =
     <b>💬 Изменить описание</b>
@@ -826,7 +895,7 @@ msg-plan-description =
     </blockquote>
     }
 
-    Введите новое описание плана.
+    Введите новое описание плана или ключ перевода.
 
 msg-plan-tag =
     <b>📌 Изменить тег</b>
@@ -839,12 +908,12 @@ msg-plan-tag =
     </blockquote>
     }
 
-    Введите новой тег плана (только латинские заглавные буквы, цифры и символ подчеркивания).
+    Введите новый тег плана (только латинские заглавные буквы, цифры и символ подчеркивания).
 
 msg-plan-type =
     <b>🔖 Изменить тип</b>
 
-    Выберите новый тип плана.
+    Выберите новый тип плана. Отметьте кнопкой «Пробник», чтобы предоставить данный план как пробный.
 
 msg-plan-availability =
     <b>✴️ Изменить доступность</b>
@@ -873,7 +942,7 @@ msg-plan-duration =
 
 msg-plan-prices =
     <b>💰 Изменить цены длительности ({ $value ->
-            [-1] { unlimited }
+            [0] { unlimited }
             *[other] { unit-day }
         })</b>
 
@@ -881,7 +950,7 @@ msg-plan-prices =
 
 msg-plan-price =
     <b>💰 Изменить цену для длительности ({ $value ->
-            [-1] { unlimited }
+            [0] { unlimited }
             *[other] { unit-day }
         })</b>
 
@@ -925,7 +994,7 @@ msg-notifications-system = <b>⚙️ Системные уведомления</
 # Subscription
 msg-subscription-main = <b>💳 Подписка</b>
 msg-subscription-plans = <b>📦 Выберите план</b>
-msg-subscription-new-success = Чтобы начать пользоваться нашим сервисом, нажмите кнопку <code>`{ btn-subscription-connect }`</code> и следуйте инструкциям!
+msg-subscription-new-success = Чтобы начать пользоваться нашим сервисом, нажмите кнопку <code>`{ btn-subscription.connect }`</code> и следуйте инструкциям!
 msg-subscription-renew-success = Ваша подписка продлена на { $added_duration }.
 
 msg-subscription-details =
@@ -960,11 +1029,11 @@ msg-subscription-payment-method =
     { msg-subscription-details }
 
 msg-subscription-confirm =
-    { $purchase_type ->
-    [RENEW] <b>🛒 Подтверждение продления подписки</b>
-    [CHANGE] <b>🛒 Подтверждение изменения подписки</b>
-    *[OTHER] <b>🛒 Подтверждение покупки подписки</b>
-    }
+    <b>🛒 Подтверждение { $purchase_type ->
+    [RENEW] продления
+    [CHANGE] изменения
+    *[OTHER] покупки
+    } подписки</b>
 
     { msg-subscription-details }
 
@@ -1005,7 +1074,7 @@ msg-subscription-failed =
 msg-importer-main =
     <b>📥 Импорт пользователей</b>
 
-    Запуск синхронизации: проверка всех пользователей в RemnaWave. Если пользователя нет в базе бота, он будет создан и получит временную подписку. Если данные пользователя отличаются, они будут автоматически обновлены.
+    Запуск синхронизации: проверка всех пользователей в RemnaWave. Если пользователя нет в базе бота, он будет создан и получит временную подписку. Если данные пользователя отличаются, они будут автоматически обновлены (приоритет на данные из панели).
 
 msg-importer-from-xui =
     <b>📥 Импорт пользователей (3X-UI)</b>
@@ -1019,7 +1088,7 @@ msg-importer-from-xui =
     С истекшей подпиской: { $expired }
     </blockquote>
     *[0]
-    Импортируются все активные пользователи с числовым email.
+    Импортируются все <b>активные</b> пользователи с <b>числовым</b> email.
 
     Рекомендуется заранее отключить пользователей, у которых в поле email отсутствует Telegram ID. Операция может занять значительное время в зависимости от количества пользователей.
 

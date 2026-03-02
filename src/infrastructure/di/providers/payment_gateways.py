@@ -6,9 +6,9 @@ from aiogram import Bot
 from dishka import Provider, Scope, provide
 from loguru import logger
 
+from src.application.dto.payment_gateway import PaymentGatewayDto
 from src.core.config import AppConfig
 from src.core.enums import PaymentGatewayType
-from src.infrastructure.database.models.dto import PaymentGatewayDto
 from src.infrastructure.payment_gateways import (
     BasePaymentGateway,
     CryptomusGateway,
@@ -25,7 +25,6 @@ GATEWAY_MAP: dict[PaymentGatewayType, Type[BasePaymentGateway]] = {
     PaymentGatewayType.YOOMONEY: YoomoneyGateway,
     PaymentGatewayType.CRYPTOMUS: CryptomusGateway,
     PaymentGatewayType.HELEKET: HeleketGateway,
-    # PaymentGatewayType.URLPAY: UrlpayGateway,
 }
 
 
@@ -35,7 +34,7 @@ class PaymentGatewaysProvider(Provider):
 
     @provide()
     def get_gateway_factory(self, bot: Bot, config: AppConfig) -> PaymentGatewayFactory:
-        def create_gateway(gateway: PaymentGatewayDto) -> BasePaymentGateway:
+        def get_instance(gateway: PaymentGatewayDto) -> BasePaymentGateway:
             gateway_type = gateway.type
 
             if gateway_type in self._cached_gateways:
@@ -60,4 +59,4 @@ class PaymentGatewaysProvider(Provider):
 
             return self._cached_gateways[gateway_type]
 
-        return create_gateway
+        return get_instance

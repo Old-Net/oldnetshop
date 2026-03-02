@@ -6,13 +6,14 @@ from pydantic import Field, SecretStr, field_validator
 from pydantic_core.core_schema import FieldValidationInfo
 
 from src.core.constants import API_V1, ASSETS_DIR, DOMAIN_REGEX, PAYMENTS_WEBHOOK_PATH
-from src.core.enums import Locale, PaymentGatewayType
-from src.core.utils.types import LocaleList, StringList
+from src.core.enums import Locale, LogLevel, PaymentGatewayType
+from src.core.types import LocaleList, StringList
 
 from .base import BaseConfig
 from .bot import BotConfig
 from .build import BuildConfig
 from .database import DatabaseConfig
+from .log import LogConfig
 from .redis import RedisConfig
 from .remnawave import RemnawaveConfig
 from .validators import validate_not_change_me
@@ -23,11 +24,12 @@ class AppConfig(BaseConfig, env_prefix="APP_"):
     host: str = "0.0.0.0"
     port: int = 5000
 
-    locales: LocaleList = LocaleList([Locale.EN])
-    default_locale: Locale = Locale.EN
+    locales: LocaleList = LocaleList([Locale.RU])  # TODO: Change to EN
+    default_locale: Locale = Locale.RU  # TODO: Change to EN
 
     crypt_key: SecretStr
     assets_dir: Path = ASSETS_DIR
+    log_level: LogLevel = LogLevel.DEBUG
     origins: StringList = StringList("")
 
     bot: BotConfig = Field(default_factory=BotConfig)
@@ -35,6 +37,7 @@ class AppConfig(BaseConfig, env_prefix="APP_"):
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
     redis: RedisConfig = Field(default_factory=RedisConfig)
     build: BuildConfig = Field(default_factory=BuildConfig)
+    log: LogConfig = Field(default_factory=LogConfig)
 
     @property
     def banners_dir(self) -> Path:

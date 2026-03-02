@@ -1,7 +1,8 @@
 from aiogram import Bot
 
+from src.application.dto import PaymentGatewayDto
+from src.application.dto.payment_gateway import HeleketGatewaySettingsDto
 from src.core.config import AppConfig
-from src.infrastructure.database.models.dto import HeleketGatewaySettingsDto, PaymentGatewayDto
 
 from .cryptomus import CryptomusGateway
 
